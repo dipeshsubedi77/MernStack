@@ -6,12 +6,24 @@ const app = express();
 
 
 
+
 const {multer,storage} = require('./middleware/multerConfig')
 const upload = multer({storage:storage})
 
 
 
 const fs = require('fs')
+const cors =  require('cors')
+// only the website mention below can access the api
+// app.use(cors(
+
+app.use(cors(
+  {
+    origin: "http://localhost:5173"
+
+  }
+))
+
 
 // file upload haru/..........
 
@@ -34,7 +46,14 @@ app.use(express.json());
     console.log(req.file)
     const{title,description,subtitle} = req.body
 
-    const fileName = req.file.filename 
+    let filename;
+
+    if(req.file){
+      filename = req.file.filename
+    }
+    else{
+      filename = "default.jpg"
+    }
     if(!title || !subtitle|| !description){
       return res.status(400).json(
         {
@@ -51,7 +70,7 @@ app.use(express.json());
       description : description,
       
       subtitle: subtitle,
-      image: fileName
+      image: filename
 
     })
     res.status(200).json({
